@@ -2,7 +2,6 @@ package com.example.androidrecorddemo.core.audioplayer
 
 import android.media.MediaPlayer
 import android.util.Log
-import com.example.androidrecorddemo.core.toSecondsFormatted
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +14,8 @@ class MediaPlayerProvider : AudioPlayerProvider {
     private val _playerStatusStateFlow = MutableStateFlow(
         PlayerProgress(
             percentage = 0f,
-            currentSeconds = "",
-            duration = ""
+            currentSeconds = 0,
+            duration = 0
         )
     )
 
@@ -45,8 +44,8 @@ class MediaPlayerProvider : AudioPlayerProvider {
                 _playerStatusStateFlow.emit(
                     PlayerProgress(
                         percentage = percentage,
-                        duration = _player!!.duration.toSecondsFormatted(),
-                        currentSeconds = _player!!.currentPosition.toSecondsFormatted()
+                        duration = _player!!.duration,
+                        currentSeconds = _player!!.currentPosition
                     )
                 )
             }
@@ -67,8 +66,8 @@ class MediaPlayerProvider : AudioPlayerProvider {
                 _playerStatusStateFlow.emit(
                     PlayerProgress(
                         percentage = 100f,
-                        currentSeconds = "",
-                        duration = ""
+                        currentSeconds = 0,
+                        duration = 0
                     )
                 )
             }

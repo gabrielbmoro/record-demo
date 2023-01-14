@@ -10,7 +10,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.androidrecorddemo.core.audioplayer.AudioPlayerProvider
 import com.example.androidrecorddemo.core.audioplayer.MediaPlayerProvider
 import com.example.androidrecorddemo.core.audiorecord.*
-import com.example.androidrecorddemo.core.fileCacheLocationFullPath
+import com.example.androidrecorddemo.core.util.AndroidUtilProvider
+import com.example.androidrecorddemo.core.util.UtilProvider
 import com.example.androidrecorddemo.ui.widgets.DropDownValue
 import com.example.androidrecorddemo.ui.widgets.PlayerCardContent
 import com.example.androidrecorddemo.ui.widgets.PlayerLineArg
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val audioPlayerProvider: AudioPlayerProvider,
-    private val audioRecorderProvider: AudioRecorderProvider
+    private val audioRecorderProvider: AudioRecorderProvider,
+    private val utilProvider: UtilProvider,
 ) : ViewModel() {
 
     private val _uiState = mutableStateOf(
@@ -55,9 +57,9 @@ class MainViewModel(
                         playerLineArg = _uiState.value.playerCardContent.playerLineArg.copy(
                             percentage = playerProgress.percentage,
                             currentTimestamp = if (playerProgress.percentage == 100f)
-                                playerProgress.duration
-                            else playerProgress.currentSeconds,
-                            durationTimestamp = playerProgress.duration
+                                utilProvider.convertToSecondsFormatted(playerProgress.duration)
+                            else utilProvider.convertToSecondsFormatted(playerProgress.currentSeconds),
+                            durationTimestamp = utilProvider.convertToSecondsFormatted(playerProgress.duration)
                         )
                     )
                 )
@@ -73,7 +75,8 @@ class MainViewModel(
             )
         )
         audioPlayerProvider.startPlaying(
-            context.fileCacheLocationFullPath(
+            utilProvider.fileCacheLocationFullPath(
+                context,
                 OUTPUT_FILE_NAME_WITH_EXTENSION
             )
         )
@@ -103,7 +106,7 @@ class MainViewModel(
         )
 
         val recordArgument = RecordArgument(
-            outputFile = context.fileCacheLocationFullPath(OUTPUT_FILE_NAME_WITH_EXTENSION),
+            outputFile = utilProvider.fileCacheLocationFullPath(context, OUTPUT_FILE_NAME_WITH_EXTENSION),
             audioEncoder = _uiState.value.recordCardContent.currentEncoderSelected.currentOption,
             audioSource = AudioSourceType.MIC,
             outputFormat = AudioOutputFormat.THREE_GPP
@@ -150,7 +153,7 @@ class MainViewModel(
     }
 
     companion object {
-        private const val OUTPUT_FILE_NAME_WITH_EXTENSION = "audiorecordtest.3gp"
+        const val OUTPUT_FILE_NAME_WITH_EXTENSION = "audiorecordtest.3gp"
 
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
@@ -160,7 +163,8 @@ class MainViewModel(
             ): T {
                 return MainViewModel(
                     audioPlayerProvider = MediaPlayerProvider(),
-                    audioRecorderProvider = MediaRecorderProvider()
+                    audioRecorderProvider = MediaRecorderProvider(),
+                    utilProvider = AndroidUtilProvider()
                 ) as T
             }
         }
