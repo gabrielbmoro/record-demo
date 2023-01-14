@@ -7,7 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.example.androidrecorddemo.core.audioplayer.AudioPlayerManager
+import com.example.androidrecorddemo.core.audioplayer.AudioPlayerProvider
+import com.example.androidrecorddemo.core.audioplayer.MediaPlayerProvider
 import com.example.androidrecorddemo.core.audiorecord.*
 import com.example.androidrecorddemo.core.fileCacheLocationFullPath
 import com.example.androidrecorddemo.ui.widgets.DropDownValue
@@ -16,10 +17,11 @@ import com.example.androidrecorddemo.ui.widgets.PlayerLineArg
 import com.example.androidrecorddemo.ui.widgets.RecordCardContent
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val audioPlayerProvider: AudioPlayerProvider
+) : ViewModel() {
 
     private val _audioRecordManager = AudioRecordManager()
-    private val _audioPlayerManager = AudioPlayerManager()
 
     private val _uiState = mutableStateOf(
         MainUIState(
@@ -48,7 +50,7 @@ class MainViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _audioPlayerManager.playerStatusStateFlow.collect { playerProgress ->
+            audioPlayerProvider.playerStatus().collect { playerProgress ->
                 _uiState.value = _uiState.value.copy(
                     playerCardContent = _uiState.value.playerCardContent.copy(
                         playerLineArg = _uiState.value.playerCardContent.playerLineArg.copy(
@@ -72,7 +74,7 @@ class MainViewModel : ViewModel() {
                 pauseButtonEnabled = true
             )
         )
-        _audioPlayerManager.startPlaying(
+        audioPlayerProvider.startPlaying(
             context.fileCacheLocationFullPath(
                 OUTPUT_FILE_NAME_WITH_EXTENSION
             )
@@ -87,7 +89,7 @@ class MainViewModel : ViewModel() {
             ),
         )
 
-        _audioPlayerManager.stopPlaying()
+        audioPlayerProvider.stopPlaying()
     }
 
     fun onRecord(context: Context) {
@@ -144,7 +146,7 @@ class MainViewModel : ViewModel() {
 
     override fun onCleared() {
         _audioRecordManager.release()
-        _audioPlayerManager.release()
+        audioPlayerProvider.release()
 
         super.onCleared()
     }
@@ -158,7 +160,9 @@ class MainViewModel : ViewModel() {
                 modelClass: Class<T>,
                 extras: CreationExtras
             ): T {
-                return MainViewModel() as T
+                return MainViewModel(
+                    audioPlayerProvider = MediaPlayerProvider()
+                ) as T
             }
         }
     }

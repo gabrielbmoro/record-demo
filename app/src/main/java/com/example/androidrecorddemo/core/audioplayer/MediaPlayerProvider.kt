@@ -7,10 +7,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
-import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.seconds
 
-class AudioPlayerManager {
+class MediaPlayerProvider : AudioPlayerProvider {
 
     private var _player: MediaPlayer? = null
 
@@ -21,11 +19,10 @@ class AudioPlayerManager {
             duration = ""
         )
     )
-    val playerStatusStateFlow: StateFlow<PlayerProgress> = _playerStatusStateFlow
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    fun startPlaying(fileName: String) {
+    override fun startPlaying(fileName: String) {
         try {
             _player = MediaPlayer()
             _player!!.setDataSource(fileName)
@@ -57,7 +54,7 @@ class AudioPlayerManager {
         }
     }
 
-    fun stopPlaying() {
+    override fun stopPlaying() {
         try {
             _player?.run {
                 stop()
@@ -79,7 +76,11 @@ class AudioPlayerManager {
         }
     }
 
-    fun release() {
+    override fun playerStatus(): StateFlow<PlayerProgress> {
+        return _playerStatusStateFlow
+    }
+
+    override fun release() {
         coroutineScope.cancel()
         _player = null
     }
