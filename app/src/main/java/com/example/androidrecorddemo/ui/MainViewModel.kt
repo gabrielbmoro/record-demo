@@ -30,8 +30,8 @@ class MainViewModel : ViewModel() {
                 false,
                 playerLineArg = PlayerLineArg(
                     percentage = 0f,
-                    maxTimestamp = "",
-                    minTimestamp = ""
+                    durationTimestamp = "",
+                    currentTimestamp = ""
                 )
             ),
             recordCardContent = RecordCardContent(
@@ -53,10 +53,10 @@ class MainViewModel : ViewModel() {
                     playerCardContent = _uiState.value.playerCardContent.copy(
                         playerLineArg = _uiState.value.playerCardContent.playerLineArg.copy(
                             percentage = playerProgress.percentage,
-                            minTimestamp = if (playerProgress.percentage == 100f)
+                            currentTimestamp = if (playerProgress.percentage == 100f)
                                 playerProgress.duration
                             else playerProgress.currentSeconds,
-                            maxTimestamp = playerProgress.duration
+                            durationTimestamp = playerProgress.duration
                         )
                     )
                 )

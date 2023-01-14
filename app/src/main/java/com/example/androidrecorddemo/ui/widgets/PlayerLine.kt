@@ -20,8 +20,8 @@ import com.example.androidrecorddemo.ui.theme.RecordDemoTheme
 
 data class PlayerLineArg(
     val percentage: Float,
-    val maxTimestamp: String,
-    val minTimestamp: String,
+    val durationTimestamp: String,
+    val currentTimestamp: String,
 )
 
 @Composable
@@ -52,7 +52,7 @@ fun PlayerLine(playerLineArg: PlayerLineArg, modifier: Modifier = Modifier) {
 
         Row {
             Text(
-                text = playerLineArg.minTimestamp,
+                text = playerLineArg.currentTimestamp,
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Bold,
                 ),
@@ -61,7 +61,7 @@ fun PlayerLine(playerLineArg: PlayerLineArg, modifier: Modifier = Modifier) {
             )
 
             Text(
-                text = playerLineArg.maxTimestamp,
+                text = playerLineArg.durationTimestamp,
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Bold
                 ),
