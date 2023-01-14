@@ -18,10 +18,9 @@ import com.example.androidrecorddemo.ui.widgets.RecordCardContent
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val audioPlayerProvider: AudioPlayerProvider
+    private val audioPlayerProvider: AudioPlayerProvider,
+    private val audioRecorderProvider: AudioRecorderProvider
 ) : ViewModel() {
-
-    private val _audioRecordManager = AudioRecordManager()
 
     private val _uiState = mutableStateOf(
         MainUIState(
@@ -62,7 +61,6 @@ class MainViewModel(
                         )
                     )
                 )
-
             }
         }
     }
@@ -110,7 +108,7 @@ class MainViewModel(
             audioSource = AudioSourceType.MIC,
             outputFormat = AudioOutputFormat.THREE_GPP
         )
-        _audioRecordManager.startRecording(context, recordArgument)
+        audioRecorderProvider.startRecording(context, recordArgument)
     }
 
     fun onEncoderSelectedChange(it: DropDownValue<AudioEncoder>) {
@@ -122,7 +120,7 @@ class MainViewModel(
     }
 
     fun onStopRecord() {
-        _audioRecordManager.stopRecording()
+        audioRecorderProvider.stopRecording()
 
         _uiState.value = _uiState.value.copy(
             playBackAvailable = true,
@@ -145,7 +143,7 @@ class MainViewModel(
     }
 
     override fun onCleared() {
-        _audioRecordManager.release()
+        audioRecorderProvider.release()
         audioPlayerProvider.release()
 
         super.onCleared()
@@ -161,7 +159,8 @@ class MainViewModel(
                 extras: CreationExtras
             ): T {
                 return MainViewModel(
-                    audioPlayerProvider = MediaPlayerProvider()
+                    audioPlayerProvider = MediaPlayerProvider(),
+                    audioRecorderProvider = MediaRecorderProvider()
                 ) as T
             }
         }

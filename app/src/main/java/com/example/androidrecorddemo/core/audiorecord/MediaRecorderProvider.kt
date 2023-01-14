@@ -6,11 +6,11 @@ import android.os.Build
 import android.util.Log
 import java.io.IOException
 
-class AudioRecordManager {
+class MediaRecorderProvider: AudioRecorderProvider {
 
     private var _recorder: MediaRecorder? = null
 
-    fun startRecording(
+    override fun startRecording(
         context: Context,
         recordArgument: RecordArgument
     ) {
@@ -37,7 +37,7 @@ class AudioRecordManager {
         }
     }
 
-    fun stopRecording() {
+    override fun stopRecording() {
         try {
             _recorder?.run {
                 stop()
@@ -50,7 +50,7 @@ class AudioRecordManager {
         }
     }
 
-    fun release() {
+    override fun release() {
         _recorder?.release()
         _recorder = null
     }
