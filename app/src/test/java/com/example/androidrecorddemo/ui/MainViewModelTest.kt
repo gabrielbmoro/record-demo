@@ -60,4 +60,22 @@ class MainViewModelTest {
             Truth.assertThat(viewModel.uiState.value.playerCardContent.stopButtonEnabled).isTrue()
         }
     }
+
+    @Test
+    fun `Test stop stuff`() {
+        runTest {
+            // arrange
+            every { utilsProvider.fileCacheLocationFullPath(any(), MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION) }.returns("filePath/${MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION}")
+            every { audioPlayerProvider.stopPlaying() }.returns(Unit)
+
+            val viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
+
+            // act
+            viewModel.onStopPlayer()
+
+            // assert
+            Truth.assertThat(viewModel.uiState.value.playerCardContent.playButtonEnabled).isTrue()
+            Truth.assertThat(viewModel.uiState.value.playerCardContent.stopButtonEnabled).isFalse()
+        }
+    }
 }
