@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.androidrecorddemo.core.audioplayer.AudioPlayerProvider
 import com.example.androidrecorddemo.core.audioplayer.MediaPlayerProvider
+import com.example.androidrecorddemo.core.audioplayer.PlayerProgress
 import com.example.androidrecorddemo.core.audiorecord.*
 import com.example.androidrecorddemo.core.util.AndroidUtilProvider
 import com.example.androidrecorddemo.core.util.UtilProvider
@@ -52,19 +53,29 @@ class MainViewModel(
     init {
         viewModelScope.launch {
             audioPlayerProvider.playerStatus().collect { playerProgress ->
-                _uiState.value = _uiState.value.copy(
-                    playerCardContent = _uiState.value.playerCardContent.copy(
-                        playerLineArg = _uiState.value.playerCardContent.playerLineArg.copy(
-                            percentage = playerProgress.percentage,
-                            currentTimestamp = if (playerProgress.percentage == 100f)
-                                utilProvider.convertToSecondsFormatted(playerProgress.duration)
-                            else utilProvider.convertToSecondsFormatted(playerProgress.currentSeconds),
-                            durationTimestamp = utilProvider.convertToSecondsFormatted(playerProgress.duration)
-                        )
-                    )
-                )
+                onPlayerStatusChanged(playerProgress)
             }
         }
+    }
+
+    private fun onPlayerStatusChanged(playerProgress: PlayerProgress) {
+        val duration = utilProvider.convertToSecondsFormatted(playerProgress.duration)
+        val current = if (playerProgress.percentage < 100f) utilProvider.convertToSecondsFormatted(
+            playerProgress.currentSeconds
+        )
+        else duration
+
+        _uiState.value = _uiState.value.copy(
+            playerCardContent = _uiState.value.playerCardContent.copy(
+                stopButtonEnabled = playerProgress.percentage in 0f..99.9f,
+                playButtonEnabled = (playerProgress.percentage == 0f) || (playerProgress.percentage == 100f),
+                playerLineArg = _uiState.value.playerCardContent.playerLineArg.copy(
+                    percentage = playerProgress.percentage,
+                    currentTimestamp = current,
+                    durationTimestamp = duration
+                )
+            )
+        )
     }
 
     fun onPlay(context: Context) {
@@ -106,7 +117,10 @@ class MainViewModel(
         )
 
         val recordArgument = RecordArgument(
-            outputFile = utilProvider.fileCacheLocationFullPath(context, OUTPUT_FILE_NAME_WITH_EXTENSION),
+            outputFile = utilProvider.fileCacheLocationFullPath(
+                context,
+                OUTPUT_FILE_NAME_WITH_EXTENSION
+            ),
             audioEncoder = _uiState.value.recordCardContent.currentEncoderSelected.currentOption,
             audioSource = AudioSourceType.MIC,
             outputFormat = AudioOutputFormat.THREE_GPP
@@ -136,6 +150,7 @@ class MainViewModel(
             ),
             playerCardContent = _uiState.value.playerCardContent.copy(
                 playButtonEnabled = true,
+                stopButtonEnabled = false,
                 playerLineArg = PlayerLineArg(
                     0f,
                     "",

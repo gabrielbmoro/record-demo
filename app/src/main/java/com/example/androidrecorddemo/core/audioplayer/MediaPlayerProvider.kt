@@ -29,6 +29,18 @@ class MediaPlayerProvider : AudioPlayerProvider {
                 prepare()
                 start()
 
+                setOnCompletionListener {
+                    coroutineScope.launch {
+                        _playerStatusStateFlow.emit(
+                            PlayerProgress(
+                                percentage = 100f,
+                                duration = _player!!.duration,
+                                currentSeconds = _player!!.duration
+                            )
+                        )
+                    }
+                }
+
                 coroutineScope.launch { monitoring() }
             }
         } catch (ioException: IOException) {
