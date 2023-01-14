@@ -95,7 +95,10 @@ class MainViewModel : ViewModel() {
             playBackAvailable = false,
             recordCardContent = _uiState.value.recordCardContent.copy(
                 recordButtonEnabled = false,
-                stopRecordButtonEnabled = true
+                stopRecordButtonEnabled = true,
+                currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
+                    enabled = false
+                )
             )
         )
 
@@ -123,7 +126,10 @@ class MainViewModel : ViewModel() {
             playBackAvailable = true,
             recordCardContent = _uiState.value.recordCardContent.copy(
                 recordButtonEnabled = true,
-                stopRecordButtonEnabled = false
+                stopRecordButtonEnabled = false,
+                currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
+                    enabled = true
+                )
             ),
             playerCardContent = _uiState.value.playerCardContent.copy(
                 playButtonEnabled = true

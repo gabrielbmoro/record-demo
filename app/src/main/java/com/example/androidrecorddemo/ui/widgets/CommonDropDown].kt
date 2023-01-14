@@ -14,7 +14,8 @@ import androidx.compose.ui.unit.sp
 
 data class DropDownValue<T>(
     val currentOption: T,
-    val expanded: Boolean
+    val expanded: Boolean,
+    val enabled: Boolean = true
 )
 
 @Composable
@@ -29,7 +30,9 @@ fun <T> CommonDropDown(
             modifier = modifier
                 .align(alignment = Alignment.CenterStart)
                 .padding(vertical = 12.dp),
-            onClick = { onValueChanged(currentValue.copy(expanded = true)) }) {
+            onClick = { onValueChanged(currentValue.copy(expanded = true)) },
+            enabled = currentValue.enabled
+        ) {
             Text(
                 text = currentValue.currentOption.toString(),
                 fontSize = 12.sp
