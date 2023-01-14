@@ -71,7 +71,7 @@ class MainViewModel(
         _uiState.value = _uiState.value.copy(
             playerCardContent = _uiState.value.playerCardContent.copy(
                 playButtonEnabled = false,
-                pauseButtonEnabled = true
+                stopButtonEnabled = true
             )
         )
         audioPlayerProvider.startPlaying(
@@ -82,11 +82,11 @@ class MainViewModel(
         )
     }
 
-    fun onPause() {
+    fun onStopPlayer() {
         _uiState.value = _uiState.value.copy(
             playerCardContent = _uiState.value.playerCardContent.copy(
                 playButtonEnabled = true,
-                pauseButtonEnabled = false
+                stopButtonEnabled = false
             ),
         )
 

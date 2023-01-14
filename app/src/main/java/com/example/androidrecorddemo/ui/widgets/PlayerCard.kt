@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.example.androidrecorddemo.ui.theme.RecordDemoTheme
 
 data class PlayerCardContent(
-    val pauseButtonEnabled: Boolean,
+    val stopButtonEnabled: Boolean,
     val playButtonEnabled: Boolean,
     val playerLineArg: PlayerLineArg
 )
@@ -20,7 +20,7 @@ data class PlayerCardContent(
 @Composable
 fun PlayerCard(
     playerCardContent: PlayerCardContent,
-    onPause: (() -> Unit),
+    onStop: (() -> Unit),
     onPlay: (() -> Unit),
     modifier: Modifier = Modifier
 ) {
@@ -43,9 +43,9 @@ fun PlayerCard(
 
             Row {
                 MediaButton(
-                    buttonStatus = ButtonStatusType.PAUSE,
-                    enabled = playerCardContent.pauseButtonEnabled,
-                    onClick = onPause
+                    buttonStatus = ButtonStatusType.STOP,
+                    enabled = playerCardContent.stopButtonEnabled,
+                    onClick = onStop
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -67,7 +67,7 @@ fun PlayerCardPreview() {
         PlayerCard(
             PlayerCardContent(
                 playButtonEnabled = true,
-                pauseButtonEnabled = false,
+                stopButtonEnabled = false,
                 playerLineArg = PlayerLineArg(
                     0.5f,
                     "2:00",

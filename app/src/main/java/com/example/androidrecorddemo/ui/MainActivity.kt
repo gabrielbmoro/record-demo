@@ -91,8 +91,8 @@ fun MainScreen(viewModel: MainViewModel) {
                     onPlay = {
                         viewModel.onPlay(context)
                     },
-                    onPause = {
-                        viewModel.onPause()
+                    onStop = {
+                        viewModel.onStopPlayer()
                     }
                 )
             }

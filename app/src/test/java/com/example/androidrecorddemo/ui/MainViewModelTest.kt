@@ -1,9 +1,7 @@
 package com.example.androidrecorddemo.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.compose.runtime.mutableStateOf
 import com.example.androidrecorddemo.core.audioplayer.AudioPlayerProvider
-import com.example.androidrecorddemo.core.audioplayer.AudioPlayerStatus
 import com.example.androidrecorddemo.core.audioplayer.PlayerProgress
 import com.example.androidrecorddemo.core.audiorecord.AudioRecorderProvider
 import com.example.androidrecorddemo.core.util.UtilProvider
@@ -59,7 +57,7 @@ class MainViewModelTest {
             // assert
             every { audioPlayerProvider.startPlaying(MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION) }
             Truth.assertThat(viewModel.uiState.value.playerCardContent.playButtonEnabled).isFalse()
-            Truth.assertThat(viewModel.uiState.value.playerCardContent.pauseButtonEnabled).isTrue()
+            Truth.assertThat(viewModel.uiState.value.playerCardContent.stopButtonEnabled).isTrue()
         }
     }
 }
