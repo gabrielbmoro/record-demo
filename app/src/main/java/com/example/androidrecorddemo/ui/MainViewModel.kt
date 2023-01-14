@@ -132,7 +132,12 @@ class MainViewModel : ViewModel() {
                 )
             ),
             playerCardContent = _uiState.value.playerCardContent.copy(
-                playButtonEnabled = true
+                playButtonEnabled = true,
+                playerLineArg = PlayerLineArg(
+                    0f,
+                    "",
+                    ""
+                )
             )
         )
     }
