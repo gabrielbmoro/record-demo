@@ -22,7 +22,7 @@ class MediaRecorderProvider : AudioRecorderProvider {
 
     private val _recordTimeElapsed = MutableStateFlow(0)
 
-    private val _timer = Timer(true)
+    private var _timer: Timer? = null
 
     override fun startRecording(
         context: Context,
@@ -45,7 +45,11 @@ class MediaRecorderProvider : AudioRecorderProvider {
                 start()
 
                 _recordTimeElapsed.value = 0
-                _timer.schedule(
+
+                releaseTimer()
+
+                _timer = Timer()
+                _timer?.schedule(
                     object : TimerTask() {
                         override fun run() {
                             coroutineScope.launch {
@@ -69,7 +73,7 @@ class MediaRecorderProvider : AudioRecorderProvider {
             _recorder?.run {
                 stop()
                 release()
-                _timer.cancel()
+                releaseTimer()
             }
         } catch (exception: Exception) {
             Log.e(TAG, "stopRecording: $exception")
@@ -83,11 +87,16 @@ class MediaRecorderProvider : AudioRecorderProvider {
         _recorder = null
 
         coroutineScope.cancel()
-        _timer.cancel()
+        releaseTimer()
     }
 
     override fun recorderTimeElapsed(): StateFlow<Int> {
         return _recordTimeElapsed
+    }
+
+    private fun releaseTimer() {
+        _timer?.cancel()
+        _timer = null
     }
 
     companion object {
