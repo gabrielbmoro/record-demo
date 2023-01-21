@@ -91,43 +91,33 @@ class MainViewModel(
     }
 
     fun onPlay(context: Context) {
-        _uiState.value = _uiState.value.copy(
-            playerCardContent = _uiState.value.playerCardContent.copy(
-                playButtonEnabled = false,
-                stopButtonEnabled = true
-            )
-        )
         audioPlayerProvider.startPlaying(
             utilProvider.fileCacheLocationFullPath(
                 context,
                 OUTPUT_FILE_NAME_WITH_EXTENSION
             )
         )
+
+        _uiState.value = _uiState.value.copy(
+            playerCardContent = _uiState.value.playerCardContent.copy(
+                playButtonEnabled = false,
+                stopButtonEnabled = true
+            )
+        )
     }
 
     fun onStopPlayer() {
+        audioPlayerProvider.stopPlaying()
+
         _uiState.value = _uiState.value.copy(
             playerCardContent = _uiState.value.playerCardContent.copy(
                 playButtonEnabled = true,
                 stopButtonEnabled = false
             ),
         )
-
-        audioPlayerProvider.stopPlaying()
     }
 
     fun onRecord(context: Context) {
-        _uiState.value = _uiState.value.copy(
-            playBackAvailable = false,
-            recordCardContent = _uiState.value.recordCardContent.copy(
-                recordButtonEnabled = false,
-                stopRecordButtonEnabled = true,
-                currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
-                    enabled = false
-                )
-            )
-        )
-
         val recordArgument = RecordArgument(
             outputFile = utilProvider.fileCacheLocationFullPath(
                 context,
@@ -138,6 +128,17 @@ class MainViewModel(
             outputFormat = AudioOutputFormat.THREE_GPP
         )
         audioRecorderProvider.startRecording(context, recordArgument)
+
+        _uiState.value = _uiState.value.copy(
+            playBackAvailable = false,
+            recordCardContent = _uiState.value.recordCardContent.copy(
+                recordButtonEnabled = false,
+                stopRecordButtonEnabled = true,
+                currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
+                    enabled = false
+                )
+            )
+        )
     }
 
     fun onEncoderSelectedChange(it: DropDownValue<AudioEncoder>) {
