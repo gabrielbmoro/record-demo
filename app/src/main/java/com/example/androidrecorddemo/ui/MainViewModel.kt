@@ -44,7 +44,8 @@ class MainViewModel(
                     expanded = false,
                 ),
                 recordButtonEnabled = true,
-                stopRecordButtonEnabled = false
+                stopRecordButtonEnabled = false,
+                duration = ""
             )
         )
     )
@@ -54,6 +55,17 @@ class MainViewModel(
         viewModelScope.launch {
             audioPlayerProvider.playerStatus().collect { playerProgress ->
                 onPlayerStatusChanged(playerProgress)
+            }
+        }
+
+        viewModelScope.launch {
+            audioRecorderProvider.recorderTimeElapsed().collect { timeElapsedInMs ->
+                val duration = utilProvider.convertToSecondsFormatted(timeElapsedInMs)
+                _uiState.value = _uiState.value.copy(
+                    recordCardContent = _uiState.value.recordCardContent.copy(
+                        duration = duration
+                    )
+                )
             }
         }
     }

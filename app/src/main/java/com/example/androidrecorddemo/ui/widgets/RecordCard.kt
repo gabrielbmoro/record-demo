@@ -14,6 +14,7 @@ data class RecordCardContent(
     val currentEncoderSelected: DropDownValue<AudioEncoder>,
     val stopRecordButtonEnabled: Boolean,
     val recordButtonEnabled: Boolean,
+    val duration: String,
 )
 
 @Composable
@@ -45,6 +46,13 @@ fun RecordCard(
                 currentValue = content.currentEncoderSelected,
                 options = AudioEncoder.values().toList(),
             )
+
+            RecordStopwatch(
+                duration = content.duration,
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            Spacer(modifier = Modifier.height(18.dp))
 
             Row {
                 MediaButton(
@@ -79,6 +87,7 @@ fun RecordCardPreview() {
                     currentOption = AudioEncoder.AAC,
                     expanded = false,
                 ),
+                duration = "0:25"
             ),
             {},
             {},
