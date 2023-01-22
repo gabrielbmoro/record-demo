@@ -7,9 +7,9 @@ interface AudioRecorderProvider {
 
     fun recorderTimeElapsed(): StateFlow<Int>
 
-    fun startRecording(context: Context, recordArgument: RecordArgument)
+    fun startRecording(context: Context, recordArgument: RecordArgument): Boolean
 
-    fun stopRecording()
+    fun stopRecording(): Boolean
 
     fun release()
 }

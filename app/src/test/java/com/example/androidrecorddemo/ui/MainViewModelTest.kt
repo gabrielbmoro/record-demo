@@ -1,6 +1,5 @@
 package com.example.androidrecorddemo.ui
 
-import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.androidrecorddemo.core.audioplayer.AudioPlayerProvider
 import com.example.androidrecorddemo.core.audioplayer.PlayerProgress
@@ -26,7 +25,7 @@ class MainViewModelTest {
     private lateinit var audioRecorderProvider: AudioRecorderProvider
     private lateinit var audioPlayerProvider: AudioPlayerProvider
     private lateinit var utilsProvider: UtilProvider
-    private val context: Context = mockk()
+    private lateinit var viewModel: MainViewModel
 
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
@@ -52,15 +51,14 @@ class MainViewModelTest {
         every { utilsProvider.convertToSecondsFormatted(0) }.returns("")
 
         Dispatchers.setMain(mainThreadSurrogate)
+        this.viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
     }
 
     @Test
-    fun `Start player`() {
+    fun `Start player success`() {
         runTest {
             // arrange
-            every { audioPlayerProvider.startPlaying(any()) }.returns(Unit)
-
-            val viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
+            every { audioPlayerProvider.startPlaying(any()) }.returns(true)
 
             // act
             viewModel.onPlay(mockk())
@@ -72,12 +70,12 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `Stop player`() {
+    fun `Stop player success`() {
         runTest {
             // arrange
-            every { audioPlayerProvider.stopPlaying() }.returns(Unit)
-
-            val viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
+            every { audioPlayerProvider.stopPlaying() }.returns(true)
+            every { audioPlayerProvider.startPlaying(any()) }.returns(true)
+            viewModel.onPlay(mockk())
 
             // act
             viewModel.onStopPlayer()
@@ -89,12 +87,29 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `Stop recording`() {
+    fun `Stop player failed`() {
         runTest {
             // arrange
-            every { audioRecorderProvider.stopRecording() }.returns(Unit)
+            every { audioPlayerProvider.stopPlaying() }.returns(false)
+            every { audioPlayerProvider.startPlaying(any()) }.returns(true)
+            viewModel.onPlay(mockk())
 
-            val viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
+            // act
+            viewModel.onStopPlayer()
+
+            // assert
+            Truth.assertThat(viewModel.uiState.value.playerCardContent.playButtonEnabled).isFalse()
+            Truth.assertThat(viewModel.uiState.value.playerCardContent.stopButtonEnabled).isTrue()
+        }
+    }
+
+    @Test
+    fun `Stop recording success`() {
+        runTest {
+            // arrange
+            every { audioRecorderProvider.startRecording(any(), any()) }.returns(true)
+            every { audioRecorderProvider.stopRecording() }.returns(true)
+            viewModel.onRecord(mockk())
 
             // act
             viewModel.onStopRecord()
@@ -107,15 +122,32 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `Start recording`() {
+    fun `Stop recording failed`() {
         runTest {
             // arrange
-            every { audioRecorderProvider.startRecording(context, any()) }.returns(Unit)
-
-            val viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
+            every { audioRecorderProvider.startRecording(any(), any()) }.returns(true)
+            every { audioRecorderProvider.stopRecording() }.returns(false)
+            viewModel.onRecord(mockk())
 
             // act
-            viewModel.onRecord(context)
+            viewModel.onStopRecord()
+
+            // assert
+            Truth.assertThat(viewModel.uiState.value.recordCardContent.recordButtonEnabled)
+                .isFalse()
+            Truth.assertThat(viewModel.uiState.value.recordCardContent.stopRecordButtonEnabled)
+                .isTrue()
+        }
+    }
+
+    @Test
+    fun `Start recording success`() {
+        runTest {
+            // arrange
+            every { audioRecorderProvider.startRecording(any(), any()) }.returns(true)
+
+            // act
+            viewModel.onRecord(mockk())
 
             // assert
             Truth.assertThat(viewModel.uiState.value.recordCardContent.recordButtonEnabled)

@@ -91,30 +91,34 @@ class MainViewModel(
     }
 
     fun onPlay(context: Context) {
-        audioPlayerProvider.startPlaying(
+        val success = audioPlayerProvider.startPlaying(
             utilProvider.fileCacheLocationFullPath(
                 context,
                 OUTPUT_FILE_NAME_WITH_EXTENSION
             )
         )
 
-        _uiState.value = _uiState.value.copy(
-            playerCardContent = _uiState.value.playerCardContent.copy(
-                playButtonEnabled = false,
-                stopButtonEnabled = true
+        if (success) {
+            _uiState.value = _uiState.value.copy(
+                playerCardContent = _uiState.value.playerCardContent.copy(
+                    playButtonEnabled = false,
+                    stopButtonEnabled = true
+                )
             )
-        )
+        }
     }
 
     fun onStopPlayer() {
-        audioPlayerProvider.stopPlaying()
+        val success = audioPlayerProvider.stopPlaying()
 
-        _uiState.value = _uiState.value.copy(
-            playerCardContent = _uiState.value.playerCardContent.copy(
-                playButtonEnabled = true,
-                stopButtonEnabled = false
-            ),
-        )
+        if (success) {
+            _uiState.value = _uiState.value.copy(
+                playerCardContent = _uiState.value.playerCardContent.copy(
+                    playButtonEnabled = true,
+                    stopButtonEnabled = false
+                ),
+            )
+        }
     }
 
     fun onRecord(context: Context) {
@@ -127,18 +131,20 @@ class MainViewModel(
             audioSource = AudioSourceType.MIC,
             outputFormat = AudioOutputFormat.THREE_GPP
         )
-        audioRecorderProvider.startRecording(context, recordArgument)
+        val success = audioRecorderProvider.startRecording(context, recordArgument)
 
-        _uiState.value = _uiState.value.copy(
-            playBackAvailable = false,
-            recordCardContent = _uiState.value.recordCardContent.copy(
-                recordButtonEnabled = false,
-                stopRecordButtonEnabled = true,
-                currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
-                    enabled = false
+        if (success) {
+            _uiState.value = _uiState.value.copy(
+                playBackAvailable = false,
+                recordCardContent = _uiState.value.recordCardContent.copy(
+                    recordButtonEnabled = false,
+                    stopRecordButtonEnabled = true,
+                    currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
+                        enabled = false
+                    )
                 )
             )
-        )
+        }
     }
 
     fun onEncoderSelectedChange(it: DropDownValue<AudioEncoder>) {
@@ -150,27 +156,29 @@ class MainViewModel(
     }
 
     fun onStopRecord() {
-        audioRecorderProvider.stopRecording()
+        val success = audioRecorderProvider.stopRecording()
 
-        _uiState.value = _uiState.value.copy(
-            playBackAvailable = true,
-            recordCardContent = _uiState.value.recordCardContent.copy(
-                recordButtonEnabled = true,
-                stopRecordButtonEnabled = false,
-                currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
-                    enabled = true
-                )
-            ),
-            playerCardContent = _uiState.value.playerCardContent.copy(
-                playButtonEnabled = true,
-                stopButtonEnabled = false,
-                playerLineArg = PlayerLineArg(
-                    0f,
-                    "",
-                    ""
+        if (success) {
+            _uiState.value = _uiState.value.copy(
+                playBackAvailable = true,
+                recordCardContent = _uiState.value.recordCardContent.copy(
+                    recordButtonEnabled = true,
+                    stopRecordButtonEnabled = false,
+                    currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
+                        enabled = true
+                    )
+                ),
+                playerCardContent = _uiState.value.playerCardContent.copy(
+                    playButtonEnabled = true,
+                    stopButtonEnabled = false,
+                    playerLineArg = PlayerLineArg(
+                        0f,
+                        "",
+                        ""
+                    )
                 )
             )
-        )
+        }
     }
 
     override fun onCleared() {

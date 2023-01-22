@@ -27,7 +27,7 @@ class MediaRecorderProvider : AudioRecorderProvider {
     override fun startRecording(
         context: Context,
         recordArgument: RecordArgument
-    ) {
+    ): Boolean {
         _recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             MediaRecorder(context)
         } else {
@@ -39,7 +39,7 @@ class MediaRecorderProvider : AudioRecorderProvider {
             setAudioEncoder(recordArgument.audioEncoder.value)
         }
 
-        try {
+        return try {
             _recorder?.run {
                 prepare()
                 start()
@@ -61,22 +61,24 @@ class MediaRecorderProvider : AudioRecorderProvider {
                     1000
                 )
             }
-        } catch (ioException: IOException) {
-            Log.e(TAG, "startRecording: $ioException")
-        } catch (illegalStateException: IllegalStateException) {
-            Log.e(TAG, "startRecording: $illegalStateException")
+            true
+        } catch (exception: Exception) {
+            Log.e(TAG, "startRecording: $exception")
+            false
         }
     }
 
-    override fun stopRecording() {
-        try {
+    override fun stopRecording(): Boolean {
+        return try {
             _recorder?.run {
                 stop()
                 release()
                 releaseTimer()
             }
+            true
         } catch (exception: Exception) {
             Log.e(TAG, "stopRecording: $exception")
+            false
         } finally {
             _recorder = null
         }

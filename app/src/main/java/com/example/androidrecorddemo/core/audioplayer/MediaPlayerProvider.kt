@@ -21,8 +21,8 @@ class MediaPlayerProvider : AudioPlayerProvider {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    override fun startPlaying(fileName: String) {
-        try {
+    override fun startPlaying(fileName: String): Boolean {
+        return try {
             _player = MediaPlayer()
             _player!!.setDataSource(fileName)
             _player!!.run {
@@ -42,9 +42,11 @@ class MediaPlayerProvider : AudioPlayerProvider {
                 }
 
                 coroutineScope.launch { monitoring() }
+                true
             }
-        } catch (ioException: IOException) {
-            Log.e(TAG, "startPlaying: $ioException")
+        } catch (exception: Exception) {
+            Log.e(TAG, "startPlaying: $exception")
+            false
         }
     }
 
@@ -65,14 +67,16 @@ class MediaPlayerProvider : AudioPlayerProvider {
         }
     }
 
-    override fun stopPlaying() {
-        try {
+    override fun stopPlaying(): Boolean {
+        return try {
             _player?.run {
                 stop()
                 release()
             }
+            true
         } catch (exception: Exception) {
             Log.e(TAG, "stopPlaying: $exception")
+            false
         } finally {
             coroutineScope.launch {
                 _playerStatusStateFlow.emit(
