@@ -2,10 +2,12 @@ package com.example.androidrecorddemo.ui.widgets
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
+import com.example.androidrecorddemo.R
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,7 +36,7 @@ fun PlayerCard(
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold,
                 ),
-                text = "Play recording"
+                text = stringResource(id = R.string.play_recording)
             )
 
             Spacer(modifier = Modifier.height(22.dp))
