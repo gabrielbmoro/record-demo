@@ -44,7 +44,8 @@ class MainViewModel(
                     expanded = false,
                 ),
                 recordButtonEnabled = true,
-                stopRecordButtonEnabled = false
+                stopRecordButtonEnabled = false,
+                duration = ""
             )
         )
     )
@@ -54,6 +55,17 @@ class MainViewModel(
         viewModelScope.launch {
             audioPlayerProvider.playerStatus().collect { playerProgress ->
                 onPlayerStatusChanged(playerProgress)
+            }
+        }
+
+        viewModelScope.launch {
+            audioRecorderProvider.recorderTimeElapsed().collect { timeElapsedInMs ->
+                val duration = utilProvider.convertToSecondsFormatted(timeElapsedInMs)
+                _uiState.value = _uiState.value.copy(
+                    recordCardContent = _uiState.value.recordCardContent.copy(
+                        duration = duration
+                    )
+                )
             }
         }
     }
@@ -79,43 +91,37 @@ class MainViewModel(
     }
 
     fun onPlay(context: Context) {
-        _uiState.value = _uiState.value.copy(
-            playerCardContent = _uiState.value.playerCardContent.copy(
-                playButtonEnabled = false,
-                stopButtonEnabled = true
-            )
-        )
-        audioPlayerProvider.startPlaying(
+        val success = audioPlayerProvider.startPlaying(
             utilProvider.fileCacheLocationFullPath(
                 context,
                 OUTPUT_FILE_NAME_WITH_EXTENSION
             )
         )
+
+        if (success) {
+            _uiState.value = _uiState.value.copy(
+                playerCardContent = _uiState.value.playerCardContent.copy(
+                    playButtonEnabled = false,
+                    stopButtonEnabled = true
+                )
+            )
+        }
     }
 
     fun onStopPlayer() {
-        _uiState.value = _uiState.value.copy(
-            playerCardContent = _uiState.value.playerCardContent.copy(
-                playButtonEnabled = true,
-                stopButtonEnabled = false
-            ),
-        )
+        val success = audioPlayerProvider.stopPlaying()
 
-        audioPlayerProvider.stopPlaying()
+        if (success) {
+            _uiState.value = _uiState.value.copy(
+                playerCardContent = _uiState.value.playerCardContent.copy(
+                    playButtonEnabled = true,
+                    stopButtonEnabled = false
+                ),
+            )
+        }
     }
 
     fun onRecord(context: Context) {
-        _uiState.value = _uiState.value.copy(
-            playBackAvailable = false,
-            recordCardContent = _uiState.value.recordCardContent.copy(
-                recordButtonEnabled = false,
-                stopRecordButtonEnabled = true,
-                currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
-                    enabled = false
-                )
-            )
-        )
-
         val recordArgument = RecordArgument(
             outputFile = utilProvider.fileCacheLocationFullPath(
                 context,
@@ -125,7 +131,20 @@ class MainViewModel(
             audioSource = AudioSourceType.MIC,
             outputFormat = AudioOutputFormat.THREE_GPP
         )
-        audioRecorderProvider.startRecording(context, recordArgument)
+        val success = audioRecorderProvider.startRecording(context, recordArgument)
+
+        if (success) {
+            _uiState.value = _uiState.value.copy(
+                playBackAvailable = false,
+                recordCardContent = _uiState.value.recordCardContent.copy(
+                    recordButtonEnabled = false,
+                    stopRecordButtonEnabled = true,
+                    currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
+                        enabled = false
+                    )
+                )
+            )
+        }
     }
 
     fun onEncoderSelectedChange(it: DropDownValue<AudioEncoder>) {
@@ -137,27 +156,29 @@ class MainViewModel(
     }
 
     fun onStopRecord() {
-        audioRecorderProvider.stopRecording()
+        val success = audioRecorderProvider.stopRecording()
 
-        _uiState.value = _uiState.value.copy(
-            playBackAvailable = true,
-            recordCardContent = _uiState.value.recordCardContent.copy(
-                recordButtonEnabled = true,
-                stopRecordButtonEnabled = false,
-                currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
-                    enabled = true
-                )
-            ),
-            playerCardContent = _uiState.value.playerCardContent.copy(
-                playButtonEnabled = true,
-                stopButtonEnabled = false,
-                playerLineArg = PlayerLineArg(
-                    0f,
-                    "",
-                    ""
+        if (success) {
+            _uiState.value = _uiState.value.copy(
+                playBackAvailable = true,
+                recordCardContent = _uiState.value.recordCardContent.copy(
+                    recordButtonEnabled = true,
+                    stopRecordButtonEnabled = false,
+                    currentEncoderSelected = _uiState.value.recordCardContent.currentEncoderSelected.copy(
+                        enabled = true
+                    )
+                ),
+                playerCardContent = _uiState.value.playerCardContent.copy(
+                    playButtonEnabled = true,
+                    stopButtonEnabled = false,
+                    playerLineArg = PlayerLineArg(
+                        0f,
+                        "",
+                        ""
+                    )
                 )
             )
-        )
+        }
     }
 
     override fun onCleared() {

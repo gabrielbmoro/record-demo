@@ -16,7 +16,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(DelicateCoroutinesApi::class)
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 class MainViewModelTest {
 
     @get:Rule
@@ -25,6 +25,7 @@ class MainViewModelTest {
     private lateinit var audioRecorderProvider: AudioRecorderProvider
     private lateinit var audioPlayerProvider: AudioPlayerProvider
     private lateinit var utilsProvider: UtilProvider
+    private lateinit var viewModel: MainViewModel
 
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
@@ -37,38 +38,44 @@ class MainViewModelTest {
         every { audioPlayerProvider.playerStatus() }.returns(
             MutableStateFlow(PlayerProgress(100f, 0, 0))
         )
+        every { audioRecorderProvider.recorderTimeElapsed() }.returns(
+            MutableStateFlow(0)
+        )
+
+        every {
+            utilsProvider.fileCacheLocationFullPath(
+                any(),
+                any()
+            )
+        }.returns("file")
         every { utilsProvider.convertToSecondsFormatted(0) }.returns("")
 
         Dispatchers.setMain(mainThreadSurrogate)
+        this.viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
     }
 
     @Test
-    fun `Test playing stuff`() {
+    fun `Start player success`() {
         runTest {
             // arrange
-            every { utilsProvider.fileCacheLocationFullPath(any(), MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION) }.returns("filePath/${MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION}")
-            every { audioPlayerProvider.startPlaying("filePath/${MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION}") }.returns(Unit)
-
-            val viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
+            every { audioPlayerProvider.startPlaying(any()) }.returns(true)
 
             // act
             viewModel.onPlay(mockk())
 
             // assert
-            every { audioPlayerProvider.startPlaying(MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION) }
             Truth.assertThat(viewModel.uiState.value.playerCardContent.playButtonEnabled).isFalse()
             Truth.assertThat(viewModel.uiState.value.playerCardContent.stopButtonEnabled).isTrue()
         }
     }
 
     @Test
-    fun `Test stop stuff`() {
+    fun `Stop player success`() {
         runTest {
             // arrange
-            every { utilsProvider.fileCacheLocationFullPath(any(), MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION) }.returns("filePath/${MainViewModel.OUTPUT_FILE_NAME_WITH_EXTENSION}")
-            every { audioPlayerProvider.stopPlaying() }.returns(Unit)
-
-            val viewModel = MainViewModel(audioPlayerProvider, audioRecorderProvider, utilsProvider)
+            every { audioPlayerProvider.stopPlaying() }.returns(true)
+            every { audioPlayerProvider.startPlaying(any()) }.returns(true)
+            viewModel.onPlay(mockk())
 
             // act
             viewModel.onStopPlayer()
@@ -76,6 +83,77 @@ class MainViewModelTest {
             // assert
             Truth.assertThat(viewModel.uiState.value.playerCardContent.playButtonEnabled).isTrue()
             Truth.assertThat(viewModel.uiState.value.playerCardContent.stopButtonEnabled).isFalse()
+        }
+    }
+
+    @Test
+    fun `Stop player failed`() {
+        runTest {
+            // arrange
+            every { audioPlayerProvider.stopPlaying() }.returns(false)
+            every { audioPlayerProvider.startPlaying(any()) }.returns(true)
+            viewModel.onPlay(mockk())
+
+            // act
+            viewModel.onStopPlayer()
+
+            // assert
+            Truth.assertThat(viewModel.uiState.value.playerCardContent.playButtonEnabled).isFalse()
+            Truth.assertThat(viewModel.uiState.value.playerCardContent.stopButtonEnabled).isTrue()
+        }
+    }
+
+    @Test
+    fun `Stop recording success`() {
+        runTest {
+            // arrange
+            every { audioRecorderProvider.startRecording(any(), any()) }.returns(true)
+            every { audioRecorderProvider.stopRecording() }.returns(true)
+            viewModel.onRecord(mockk())
+
+            // act
+            viewModel.onStopRecord()
+
+            // assert
+            Truth.assertThat(viewModel.uiState.value.recordCardContent.recordButtonEnabled).isTrue()
+            Truth.assertThat(viewModel.uiState.value.recordCardContent.stopRecordButtonEnabled)
+                .isFalse()
+        }
+    }
+
+    @Test
+    fun `Stop recording failed`() {
+        runTest {
+            // arrange
+            every { audioRecorderProvider.startRecording(any(), any()) }.returns(true)
+            every { audioRecorderProvider.stopRecording() }.returns(false)
+            viewModel.onRecord(mockk())
+
+            // act
+            viewModel.onStopRecord()
+
+            // assert
+            Truth.assertThat(viewModel.uiState.value.recordCardContent.recordButtonEnabled)
+                .isFalse()
+            Truth.assertThat(viewModel.uiState.value.recordCardContent.stopRecordButtonEnabled)
+                .isTrue()
+        }
+    }
+
+    @Test
+    fun `Start recording success`() {
+        runTest {
+            // arrange
+            every { audioRecorderProvider.startRecording(any(), any()) }.returns(true)
+
+            // act
+            viewModel.onRecord(mockk())
+
+            // assert
+            Truth.assertThat(viewModel.uiState.value.recordCardContent.recordButtonEnabled)
+                .isFalse()
+            Truth.assertThat(viewModel.uiState.value.recordCardContent.stopRecordButtonEnabled)
+                .isTrue()
         }
     }
 }

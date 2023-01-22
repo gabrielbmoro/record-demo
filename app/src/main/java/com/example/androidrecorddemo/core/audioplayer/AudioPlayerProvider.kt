@@ -4,9 +4,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface AudioPlayerProvider {
 
-    fun startPlaying(fileName: String)
+    fun startPlaying(fileName: String): Boolean
 
-    fun stopPlaying()
+    fun stopPlaying(): Boolean
 
     fun playerStatus(): StateFlow<PlayerProgress>
 
