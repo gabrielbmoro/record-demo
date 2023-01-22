@@ -2,4 +2,5 @@
     <string name="app_name">RecordDemo</string>
     <string name="play_recording">Play recording</string>
     <string name="record">Record</string>
+    <string name="error_message">Something went wrong.</string>
 </resources>

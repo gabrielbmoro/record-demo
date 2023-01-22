@@ -30,8 +30,8 @@ class MainViewModel(
             playBackAvailable = false,
             recordAvailable = true,
             playerCardContent = PlayerCardContent(
-                false,
-                false,
+                stopButtonEnabled = false,
+                playButtonEnabled = false,
                 playerLineArg = PlayerLineArg(
                     percentage = 0f,
                     durationTimestamp = "",
@@ -90,7 +90,7 @@ class MainViewModel(
         )
     }
 
-    fun onPlay(context: Context) {
+    fun onPlay(context: Context, errorCallback: (() -> Unit) = {}) {
         val success = audioPlayerProvider.startPlaying(
             utilProvider.fileCacheLocationFullPath(
                 context,
@@ -105,10 +105,12 @@ class MainViewModel(
                     stopButtonEnabled = true
                 )
             )
+        } else {
+            errorCallback()
         }
     }
 
-    fun onStopPlayer() {
+    fun onStopPlayer(errorCallback: (() -> Unit) = {}) {
         val success = audioPlayerProvider.stopPlaying()
 
         if (success) {
@@ -118,10 +120,12 @@ class MainViewModel(
                     stopButtonEnabled = false
                 ),
             )
+        } else run {
+            errorCallback()
         }
     }
 
-    fun onRecord(context: Context) {
+    fun onRecord(context: Context, errorCallback: () -> Unit = {}) {
         val recordArgument = RecordArgument(
             outputFile = utilProvider.fileCacheLocationFullPath(
                 context,
@@ -144,6 +148,8 @@ class MainViewModel(
                     )
                 )
             )
+        } else run {
+            errorCallback()
         }
     }
 
@@ -155,7 +161,7 @@ class MainViewModel(
         )
     }
 
-    fun onStopRecord() {
+    fun onStopRecord(errorCallback: (() -> Unit) = {}) {
         val success = audioRecorderProvider.stopRecording()
 
         if (success) {
@@ -178,6 +184,8 @@ class MainViewModel(
                     )
                 )
             )
+        } else run {
+            errorCallback()
         }
     }
 

@@ -2,6 +2,7 @@ package com.example.androidrecorddemo.ui
 
 import android.Manifest
 import android.os.Bundle
+import com.example.androidrecorddemo.R
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -58,6 +59,14 @@ fun MainScreen(viewModel: MainViewModel) {
     val uiState = remember { viewModel.uiState }
     val context = LocalContext.current
 
+    val errorCallback = {
+        Toast.makeText(
+            context,
+            R.string.error_message,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -75,10 +84,15 @@ fun MainScreen(viewModel: MainViewModel) {
                         viewModel.onEncoderSelectedChange(it)
                     },
                     onStopRecord = {
-                        viewModel.onStopRecord()
+                        viewModel.onStopRecord(
+                            errorCallback = errorCallback
+                        )
                     },
                     onRecord = {
-                        viewModel.onRecord(context)
+                        viewModel.onRecord(
+                            context,
+                            errorCallback
+                        )
                     }
                 )
             }
@@ -89,10 +103,15 @@ fun MainScreen(viewModel: MainViewModel) {
                 PlayerCard(
                     playerCardContent = uiState.value.playerCardContent,
                     onPlay = {
-                        viewModel.onPlay(context)
+                        viewModel.onPlay(
+                            context,
+                            errorCallback = errorCallback
+                        )
                     },
                     onStop = {
-                        viewModel.onStopPlayer()
+                        viewModel.onStopPlayer(
+                            errorCallback = errorCallback
+                        )
                     }
                 )
             }
