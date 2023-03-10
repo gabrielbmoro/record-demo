@@ -1,4 +1,4 @@
-package com.example.androidrecorddemo.core.audiorecord
+package com.example.audiorecorder.core.recorder
 
 import android.media.MediaRecorder
 

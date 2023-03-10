@@ -14,3 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "RecordDemo"
 include ':app'
+include ':audiorecorder'
+include ':videorecorder'
+include ':permissions'
