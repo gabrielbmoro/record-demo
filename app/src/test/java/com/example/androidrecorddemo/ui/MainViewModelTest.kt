@@ -1,10 +1,10 @@
 package com.example.androidrecorddemo.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.androidrecorddemo.core.audioplayer.AudioPlayerProvider
-import com.example.androidrecorddemo.core.audioplayer.PlayerProgress
-import com.example.androidrecorddemo.core.audiorecord.AudioRecorderProvider
 import com.example.androidrecorddemo.core.util.UtilProvider
+import com.example.audiorecorder.core.player.AudioPlayerProvider
+import com.example.audiorecorder.core.player.PlayerProgress
+import com.example.audiorecorder.core.recorder.AudioRecorderProvider
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk

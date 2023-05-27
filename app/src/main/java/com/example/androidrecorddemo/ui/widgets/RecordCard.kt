@@ -9,8 +9,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidrecorddemo.R
-import com.example.androidrecorddemo.core.audiorecord.AudioEncoder
 import com.example.androidrecorddemo.ui.theme.RecordDemoTheme
+import com.example.audiorecorder.core.recorder.AudioEncoder
 
 data class RecordCardContent(
     val currentEncoderSelected: DropDownValue<AudioEncoder>,

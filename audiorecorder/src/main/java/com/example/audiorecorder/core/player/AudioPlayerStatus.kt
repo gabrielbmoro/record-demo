@@ -1,4 +1,4 @@
-package com.example.androidrecorddemo.core.audioplayer
+package com.example.audiorecorder.core.player
 
 enum class AudioPlayerStatus {
     RUNNING,

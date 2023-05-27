@@ -7,16 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.example.androidrecorddemo.core.audioplayer.AudioPlayerProvider
-import com.example.androidrecorddemo.core.audioplayer.MediaPlayerProvider
-import com.example.androidrecorddemo.core.audioplayer.PlayerProgress
-import com.example.androidrecorddemo.core.audiorecord.*
 import com.example.androidrecorddemo.core.util.AndroidUtilProvider
 import com.example.androidrecorddemo.core.util.UtilProvider
 import com.example.androidrecorddemo.ui.widgets.DropDownValue
 import com.example.androidrecorddemo.ui.widgets.PlayerCardContent
 import com.example.androidrecorddemo.ui.widgets.PlayerLineArg
 import com.example.androidrecorddemo.ui.widgets.RecordCardContent
+import com.example.audiorecorder.core.player.AudioPlayerProvider
+import com.example.audiorecorder.core.player.MediaPlayerProvider
+import com.example.audiorecorder.core.player.PlayerProgress
+import com.example.audiorecorder.core.recorder.*
 import kotlinx.coroutines.launch
 
 class MainViewModel(
